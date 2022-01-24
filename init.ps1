@@ -40,13 +40,48 @@ if(!(Test-Path $ziplocation -PathType Leaf)) {
 } else {
 	Write-Host "found existing mongodb download. extracting..."
 }
+
 # unzipping file
-$destinationpath = $workingdir
-# skip unzip if folder already found
-if(!(Test-Path $destinationpath -PathType Container)) {
-	Expand-Archive -LiteralPath $ziplocation -DestinationPath $destinationpath
-	Write-Host "archive extracted. installing..."
-} else {
-	Write-Host "found existing extracted mongodb folder. installing..."
+$toolspath = $workingdir + "\dev-tools"
+# check for and make dev-tools path
+if(!(Test-Path $toolspath -PathType Container)) {
+	New-Item -Path $toolspath -ItemType directory
 }
-Read-Host -Prompt "yea"
+$mongopath = $toolspath + "\mongodb"
+# skip unzip if folder already found
+if(!(Test-Path $mongopath -PathType Container)) {
+	Expand-Archive -LiteralPath $ziplocation -DestinationPath $toolspath
+	Rename-Item ($toolspath + "\mongodb-win32-x86_64-windows-5.0.5") $mongopath
+	Write-Host "archive extracted. starting server..."
+} else {
+	Write-Host "found existing extracted mongodb folder. starting server..."
+}
+
+# ------- STARTING MONGODB SERVER
+$mongodatapath = $mongopath + "\data"
+# making data directory if it does not exist
+if(!(Test-Path $mongodatapath -PathType Container)) {
+	New-Item -Path $mongodatapath -ItemType directory
+}
+# starting mongodb server
+& ($mongopath + "\bin\mongod.exe") --dbpath $mongodatapath
+
+# ------- STARTING MONGODB SHELL
+# ask user if this should happen
+	Write-Host "mongodb has been installed and is running."
+	Write-Host "do you want to open the mongodb shell?"
+	Write-Host "(this will allow you to directly interface with the database)"
+	Write-Host $line
+do {
+	$in = Read-Host -Prompt "open mongodb shell? (y/n)"
+} while("y","n" -notcontains $in)
+Write-Host $break
+# if it's wrong, kill script
+if ($in -eq "n") {
+	Write-Host "website initialised."
+	Write-Host $line
+	Read-Host -Prompt "enter to close"
+	exit
+}
+Write-Host "converting powershell window to mongodb shell..."
+& ($mongopath + "\bin\mongo.exe")
