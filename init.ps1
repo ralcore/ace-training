@@ -1,9 +1,9 @@
 # this file initialises a working environment for the website.
 # currently mostly used for mongodb setup.
 
-# constant for echoing aesthetics
+# constants for echoing aesthetics
 $line = "-----------------"
-$break = "`n`n`n"
+$break = "`n"
 
 # ------- GETTING WORKING LOCATION
 # get working location
@@ -13,7 +13,7 @@ $wwwindex=$location.IndexOf('\www\')
 $workingdir=$location.Substring(0,$wwwindex+4)
 
 # check that we're in the right place
-Write-Host "detected uniserverz install at path $workingdir"
+Write-Host "detected uniserverz install at path $workingdir" -ForegroundColor yellow
 Write-Host $line
 # not even close to foolproof, so checking with the user everything seems right.
 do {
@@ -63,12 +63,20 @@ $mongodatapath = $mongopath + "\data"
 if(!(Test-Path $mongodatapath -PathType Container)) {
 	New-Item -Path $mongodatapath -ItemType directory
 }
-# starting mongodb server
-& ($mongopath + "\bin\mongod.exe") --dbpath $mongodatapath
+# starting mongodb server in new powershell
+# relevant if modified https://github.com/PowerShell/PowerShell/issues/5576
+# Clear-Host
+# $s = New-PSSession
+# Invoke-Command -Session $s -ScriptBlock {$host.ui.RawUI.WindowTitle = "MongoDB Shell"; &($mongopath + "\bin\mongod.exe") --dbpath $mongodatapath}
+$argumentlist = '-noexit -noprofile -command "$host.ui.RawUI.WindowTitle = \"MongoDB Server\"; &"' + $mongopath + '"\"\\bin\mongod.exe\" --dbpath "' + $mongodatapath
+Start-Process -FilePath powershell -ArgumentList $argumentlist
 
 # ------- STARTING MONGODB SHELL
 # ask user if this should happen
-	Write-Host "mongodb has been installed and is running."
+	Write-Host $break
+	Write-Host "mongodb has been installed and is running!" -ForegroundColor yellow
+	Write-Host "the newly opened powershell window is running your mongodb server."
+	Write-Host "when you wish to shut down the development environment, please shut it down safely using --> CTRL+C <--"
 	Write-Host "do you want to open the mongodb shell?"
 	Write-Host "(this will allow you to directly interface with the database)"
 	Write-Host $line
@@ -76,12 +84,18 @@ do {
 	$in = Read-Host -Prompt "open mongodb shell? (y/n)"
 } while("y","n" -notcontains $in)
 Write-Host $break
-# if it's wrong, kill script
+# if shell unwanted, end init
 if ($in -eq "n") {
-	Write-Host "website initialised."
+	Write-Host "work environment initialised!" -ForegroundColor yellow
 	Write-Host $line
 	Read-Host -Prompt "enter to close"
 	exit
 }
-Write-Host "converting powershell window to mongodb shell..."
-& ($mongopath + "\bin\mongo.exe")
+Write-Host "work environment initialised!" -ForegroundColor yellow
+Write-Host "this window will now open the mongodb shell."
+Write-Host $line
+Read-Host -Prompt "enter to continue to mongodb shell..."
+Write-Host "starting mongodb shell..."
+$host.ui.RawUI.WindowTitle = 'MongoDB Shell'
+&($mongopath + "\bin\mongo.exe")
+Read-Host -Prompt "ada"
