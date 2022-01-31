@@ -10,6 +10,12 @@ $break = "`n"
 $location=Get-Location
 $location=$location.tostring()
 $wwwindex=$location.IndexOf('\www\')
+if ($wwwindex -eq -1) {
+	Write-Host "initialisation failed, as uniserverz can't be found. try making sure this script (and by extension all of the website's files) are inside your uniserverz' /www/ folder"
+	Write-Host $line
+	Read-Host -Prompt "enter to close"
+	exit
+}
 $workingdir=$location.Substring(0,$wwwindex+4)
 
 # check that we're in the right place
@@ -28,9 +34,34 @@ if ($in -eq "n") {
 	exit
 }
 
+# ------- INSTALLING MONGODB DRIVER
+# getting download from pecl
+Write-Host "directory confirmed. beginning mongodb php driver download..."
+$downloadlink = "https://windows.php.net/downloads/pecl/releases/mongodb/1.12.0/php_mongodb-1.12.0-8.0-ts-vs16-x64.zip"
+$phplocation = $workingdir.Substring(0, $wwwindex) + "\core\php80"
+$mongodbphplocation = $phplocation + "\extensions"
+# skip download if already downloaded
+if(!(Test-Path ($mongodbphplocation + "\php_mongodb.dll") -PathType Leaf)) {
+	Invoke-WebRequest -Uri $downloadlink -OutFile ($mongodbphplocation + "\php_mongodb.zip")
+	Write-Host "download complete. extracting..."
+	Expand-Archive -LiteralPath ($mongodbphplocation + "\php_mongodb.zip") -DestinationPath ($mongodbphplocation + "\php_mongodb")
+	Move-Item ($mongodbphplocation + "\php_mongodb\php_mongodb.dll") $mongodbphplocation
+	Remove-Item ($mongodbphplocation + "\php_mongodb") -Recurse
+	Remove-Item ($mongodbphplocation + "\php_mongodb.zip")
+	Write-Host "mongodb php driver installed. adding to php extensions file..."
+} else {
+	Write-Host "found existing mongodb driver install. adding to php extensions file..."
+}
+
+# adding extension to php test file (which uniserverz uses by default)
+# NOTE: IF UNISERVERZ EVER CHANGES INI FILE THIS WILL NEED CHANGING
+(Get-Content -path ($phplocation + "\php_test.ini") -Raw) -replace ';extension=mongodb','extension=mongodb' | Set-Content -Path ($phplocation + "\php_test.ini")
+
+
+
 # ------- INSTALLING MONGODB
 # downloading mongodb files from website!
-Write-Host "directory confirmed. beginning mongodb download..."
+Write-Host "added to file. beginning mongodb download..."
 $downloadlink = "https://fastdl.mongodb.org/windows/mongodb-windows-x86_64-5.0.5.zip"
 $ziplocation = $workingdir + "\mongodb.zip"
 # skip download if already downloaded
@@ -99,3 +130,4 @@ Write-Host "starting mongodb shell..."
 $host.ui.RawUI.WindowTitle = 'MongoDB Shell'
 &($mongopath + "\bin\mongo.exe")
 Read-Host -Prompt "ada"
+
