@@ -1,0 +1,17 @@
+.border-md-right {
+    border-right: 1px solid silver
+  }
+  
+  @media (max-width: 768px) {
+  
+    .border-md-right {
+      border-right: none;
+    }
+  
+  }
+
+.navbar-nav > li{
+    padding-left:30px;
+    padding-right:30px;
+ }
+ 
