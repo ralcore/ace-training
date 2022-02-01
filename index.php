@@ -22,7 +22,7 @@
 
                     else
                         {
-                            //$('#invalidEmail').show();
+                            $("#invalidEmail").show();
                             return false;
                         }
                 }
@@ -40,7 +40,7 @@
                     <input required type="email" id="email" name="email" placeholder="Enter email"  class="form-control">
 
 
-                    <div id="invalidEmail" name="invalidEmail" class="alert alert-danger" role="alert" hidden>
+                    <div id="invalidEmail" name="invalidEmail" class="alert alert-danger" role="alert">
                         Invalid email address
                     </div>
 
