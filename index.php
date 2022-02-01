@@ -9,6 +9,11 @@
         <link href="css/loginstyles.css" rel="stylesheet">
 
         <script>
+            function toggler(divId) 
+            {
+                $("#" + divId).toggle();
+            }
+
             function testEmail()
                 {
                     emailValidation = /^\w+([\.]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
@@ -22,7 +27,7 @@
 
                     else
                         {
-                            //$('#invalidEmail').show();
+                            $("#invalidEmail").show();
                             return false;
                         }
                 }
@@ -40,7 +45,7 @@
                     <input required type="email" id="email" name="email" placeholder="Enter email"  class="form-control">
 
 
-                    <div id="invalidEmail" name="invalidEmail" class="alert alert-danger" role="alert" hidden>
+                    <div id="invalidEmail" name="invalidEmail" class="alert alert-danger" role="alert">
                         Invalid email address
                     </div>
 
