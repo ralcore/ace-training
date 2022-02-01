@@ -9,11 +9,6 @@
         <link href="css/loginstyles.css" rel="stylesheet">
 
         <script>
-            function toggler(divId) 
-            {
-                $("#" + divId).toggle();
-            }
-
             function testEmail()
                 {
                     emailValidation = /^\w+([\.]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
