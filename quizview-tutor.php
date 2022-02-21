@@ -14,7 +14,7 @@
                 <div class="col-sm-12">
                     <div class="card card-body">
                         <h5 class="card-title">Assessment Results: CS QUIZ 1</h5>
-                        <p class="card-text">Quiz for CSC0001</p>
+                        <p class="card-text">Quiz for CSC0001 - Due 2022-02-23 18:00</p>
                     </div>
                 </div>
             </div>
