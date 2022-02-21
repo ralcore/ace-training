@@ -10,7 +10,15 @@
 
     <body>
         <div class="container-fluid" style="max-width: 640px;">
-            <div class="row rounded">
+        <div class="row rounded" style="margin-top:8px">
+                <div class="col-sm-12">
+                    <div class="card card-body">
+                        <h5 class="card-title">Assessment Results: CS QUIZ 1</h5>
+                        <p class="card-text">Quiz for CSC0001</p>
+                    </div>
+                </div>
+            </div>
+            <div class="row rounded justify-content-between" style="margin-top:8px">
                 <div class="col-sm-6">
                     <div class="card">
                         <div class="card-body">
@@ -26,6 +34,8 @@
                                     <div class="h2 font-weight-bold">53%</div>
                                 </div>
                             </div>
+                            <h5 class="card-title">Students Submitted</h5>
+                            <p class="card-text">15/29</p>
                         </div>
                     </div>
                 </div>
@@ -44,10 +54,53 @@
                                     <div class="h2 font-weight-bold">53%</div>
                                 </div>
                             </div>
+                            <h5 class="card-title">Average Score</h5>
+                            <p class="card-text">78/100</p>
                         </div>
                     </div>
+                </div>  
+            </div>
+            <div class="row rounded" style="margin-top:8px">
+                <div class="col-sm-12">
+                    <div class="card card-body">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">First</th>
+                                    <th scope="col">Last</th>
+                                    <th scope="col">Score</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row">20202025</th>
+                                    <td>ralc</td>
+                                    <td>skye</td>
+                                    <td>78%</td>
+                                <tr>
+                                <tr>
+                                    <th scope="row">20202025</th>
+                                    <td>ralc</td>
+                                    <td>skye</td>
+                                    <td>78%</td>
+                                <tr>
+                                <tr>
+                                    <th scope="row">20202025</th>
+                                    <td>ralc</td>
+                                    <td>skye</td>
+                                    <td>78%</td>
+                                <tr>
+                                <tr>
+                                    <th scope="row">20202025</th>
+                                    <td>ralc</td>
+                                    <td>skye</td>
+                                    <td>78%</td>
+                                <tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <div class="col-sm-6"></div>
             </div>
         </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
