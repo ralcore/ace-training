@@ -1,0 +1,9 @@
+.btn {
+    padding: 3px 6px;
+    margin: 4px
+}
+
+/* TODO: why is this necessary? caused by bootstrap. investigate */
+a {
+    text-decoration: none;
+}
