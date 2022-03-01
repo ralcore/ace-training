@@ -18,107 +18,60 @@
                     </div>
                 </div>
             </div>
-            <div class="row rounded" style="margin-top:8px">
-                <div class="col-sm-12">
-                    <div class="card">
-                        <p class="card-header">Question 1</p>
-                        <div class="card-body">
-                            <h5 class="card-title">Why do they call it oven when you of in the cold food of out hot eat the food?</h5>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="question1" id="question1_a">
-                                <label class="form-check-label" for="question1_a">
-                                    answer
+            <form action="quizview-student-marker.php" method="post">
+                <?php
+                    // error reporting
+                    ini_set('display_errors', 1);
+                    ini_set('display_startup_errors', 1);
+                    error_reporting(E_ALL);
+
+                    // takes json input (see examplequiz.json for example)
+                    // renders to quiz layout
+
+                    $examplejson_contents = file_get_contents("js//examplejson/examplejson.json") or die();
+                    $json = json_decode($examplejson_contents);
+                    for ($i = 0; $i < Count($json->questions); $i++) {
+                        // echo start of question body
+                        echo "<div class=\"row rounded\" style=\"margin-top:8px\">
+                        <div class=\"col-sm-12\">
+                            <div class=\"card\">
+                                <p class=\"card-header\">Question 1</p>
+                                <div class=\"card-body\">
+                                    <h5 class=\"card-title\">{$json->questions[$i]->question}</h5>";
+                        // echo each question input
+                        // sorry 4 mess - 2022-02-28
+                        for ($j = 0; $j < Count($json->questions[$i]->answers); $j++) {
+                            echo '<div class="form-check">
+                                <input class="form-check-input" type="';
+                            if ($json->questions[$i]->check == 1) {
+                                echo "checkbox\" value=\"$j\"";
+                            } else {
+                                echo "radio\" value =\"$j\"";
+                            }
+                            echo "name=\"question{$i}[]\" id=\"question{$i}_{$j}\">
+                                <label class=\"form-check-label\" for=\"question{$i}_{$j}\">
+                                    {$json->questions[$i]->answers[$j]->text}
                                 </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="question1" id="question1_b">
-                                <label class="form-check-label" for="question1_b">
-                                    answer2
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="question1" id="question1_c">
-                                <label class="form-check-label" for="question1_c">
-                                    answer3
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="question1" id="question1_d">
-                                <label class="form-check-label" for="question1_d">
-                                    answer4
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row rounded" style="margin-top:8px">
-                <div class="col-sm-12">
-                    <div class="card">
-                        <p class="card-header">Question 2</p>
-                        <div class="card-body">
-                            <h5 class="card-title">Why do they call it oven when you of in the cold food of out hot eat the food?</h5>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="" name="question2" id="question2_a">
-                                <label class="form-check-label" for="question2_a">
-                                    answer
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="" name="question2" id="question2_b">
-                                <label class="form-check-label" for="question2_b">
-                                    answer2
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="" name="question2" id="question2_c">
-                                <label class="form-check-label" for="question2_c">
-                                    answer3
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="" name="question2" id="question2_d">
-                                <label class="form-check-label" for="question2_d">
-                                    answer4
-                                </label>
+                            </div>";
+                        }
+                            echo "</div>
                             </div>
                         </div>
+                    </div>";
+                    }
+                ?>
+                <div class="row rounded" style="margin-top:8px">
+                    <div class="alert alert-danger" role="alert" style="margin:0px;">
+                        <b>You have incomplete questions!</b> Press "Submit" to submit anyway.
                     </div>
                 </div>
-            </div>
-            <div class="row rounded" style="margin-top:8px">
-                <div class="col-sm-12">
-                    <div class="card">
-                        <p class="card-header">Question 3</p>
-                        <div class="card-body">
-                            <h5 class="card-title">Why do they call it oven when you of in the cold food of out hot eat the food?</h5>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="question1" id="question3_a">
-                                <label class="form-check-label" for="question3_a">
-                                    true
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="question3" id="question3_b">
-                                <label class="form-check-label" for="question3_b">
-                                    false
-                                </label>
-                            </div>
-                        </div>
+                <div class="row rounded" style="margin-top:8px;margin-bottom:8px;">
+                    <div class="col-sm-6">
+                        <button type="submit" class="btn btn-success">Submit</button>
+                        <button type="button" class="btn btn-secondary">Close</button>
                     </div>
                 </div>
-            </div>
-            <div class="row rounded" style="margin-top:8px">
-                <div class="alert alert-danger" role="alert" style="margin:0px;">
-                    <b>You have incomplete questions!</b> Press "Submit" to submit anyway.
-                </div>
-            </div>
-            <div class="row rounded" style="margin-top:8px;margin-bottom:8px;">
-                <div class="col-sm-6">
-                    <button type="button" class="btn btn-success">Submit</button>
-                    <button type="button" class="btn btn-secondary">Close</button>
-                </div>
-            </div>
+            </form>
         </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     </body>
