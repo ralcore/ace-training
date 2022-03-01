@@ -12,7 +12,6 @@
     
     // getting key names
     $keynames = array_keys($_POST);
-    print_r($keynames);
     // iterate through and check user answers against real answers
     for($i=0;$i<Count($_POST);$i++) {
         $question = substr($keynames[$i], 8);
