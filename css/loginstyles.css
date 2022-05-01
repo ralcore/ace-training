@@ -6,3 +6,9 @@
 {
     display: none;
 }
+
+.dropdown {
+    -moz-appearance: auto;
+    -webkit-appearance: auto;
+}
+

@@ -1,3 +1,76 @@
+<?php
+    session_start();
+    require_once "includes/init.php";
+
+    if($_SERVER["REQUEST_METHOD"] == "POST"){
+
+        if(empty(trim($_POST["email"]))){
+            $email_error = "email cannot be empty";
+        } else{
+            $email = trim($_POST["email"]);
+        }
+
+        if(empty(trim($_POST["password"]))){
+            $password_error = "password cannot be empty";
+        } else {
+            $password = trim($_POST["password"]);
+        }
+
+        if (!isset($username_error) && !isset($password_error)) {
+            $sql = 'SELECT id, username, email, password, usertype FROM users WHERE email = ?';
+            if ($stmt = mysqli_prepare($db, $sql)) {
+                $stmt->bind_param('s', $email);
+                if ($stmt->execute()) {
+                    $stmt->store_result();
+                    if ($stmt->num_rows() == 1) {
+                        //check password
+                        $stmt->bind_result($db_id, $db_username, $db_email, $db_password, $db_usertype);
+                        if ($stmt->fetch()) {
+                            print_r($db_password);
+                            if (password_verify($password, $db_password)) {
+                                //right password, save to session variables
+                                $_SESSION['loggedin'] = true;
+                                $_SESSION['username'] = $db_username;
+                                $_SESSION['email'] = $db_email;
+                                $_SESSION['usertype'] = $db_usertype;
+                            } else {
+                                $login_error = "password incorrect";
+                            }
+                        } else {
+                            $database_error = "unknown database error occurred (3)";
+                        }
+                    } else {
+                        $login_error = "account with email not found";
+                    }
+                } else {
+                    $database_error = "unknown database error occurred (2)";
+                }
+            } else {
+                $database_error = "unknown database error occurred (1)";
+            }
+
+        }
+
+    }
+
+    //after successful login, or if already logged in, redirect to coursesview
+    if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
+        if($_SESSION["usertype"] = "student") {
+            header("location: coursesview-student.php");
+            exit;
+        } else {
+            header("location: coursesview-tutor.php");
+            exit;
+        }
+    }
+
+    if (isset($username_error)) { echo $email_error; }
+    if (isset($password_error)) { echo $password_error; }
+    if (isset($database_error)) { echo $database_error; }
+    if (isset($login_error)) { echo $login_error; }
+
+?>
+
 <!DOCTYPE html>
 <html lang = "en">
     <head>
