@@ -9,6 +9,7 @@ if tutor/admin add "false" to field "approved" -->
 <?php
     require_once "includes/init.php";
 
+    print_r($_POST);
     if($_SERVER["REQUEST_METHOD"] == "POST"){
         //validating email
         $exp = "/^\w+([\.]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/";
@@ -67,12 +68,25 @@ if tutor/admin add "false" to field "approved" -->
             $password = $_POST["password"];
         }
 
+        //setting usertype and approval
+        switch($_POST["userType"]) {
+            case 0:
+                $usertype = "Student";
+                $approved = 1;
+            case 1:
+                $usertype = "Tutor";
+                $approved = 0;
+            case 2:
+                $usertype = "Admin";
+                $approved = 0;
+        }
+
         //assuming all above are cleared...
         if (!isset($email_error) && !isset($username_error) && !isset($password_error)) {
-            //insert new user account into database
-            $sql = 'INSERT INTO users (username, email, password, usertype) VALUES (?, ?, ?, \'student\')';
+            //if student, insert new user account into users table
+            $sql = 'INSERT INTO users (username, email, password, usertype, approved) VALUES (?, ?, ?, ?, ?)';
             if ($stmt = mysqli_prepare($db, $sql)) {
-                $stmt->bind_param('sss', $username, $email, $temp_password);
+                $stmt->bind_param('ssssi', $username, $email, $temp_password, $usertype, $approved);
                 $temp_password = password_hash($password, PASSWORD_DEFAULT);
                 if ($stmt->execute()) {
                     header("location: index.php");
@@ -98,41 +112,15 @@ if tutor/admin add "false" to field "approved" -->
         <meta charset = "utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
         <link href="css/loginstyles.css" rel="stylesheet">
-
-        <script>
-            function testEmail()
-                {
-                    emailValidation = /^\w+([\.]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-                    // Regex taken from https://stackoverflow.com/questions/15017052/understanding-email-validation-using-javascript
-                    email = document.getElementById("email").value;
-
-                    if (emailValidation.test(email))
-                        {
-                            //if student return true, else pop-up
-                            if ($("#userType").val() = 0) { 
-                                return false; 
-                            } else {
-                                //show hidden bootstrap full-screen card?
-                            }
-                            
-                        }
-
-                    else
-                        {
-                            $("#invalidEmail").show();
-                            return false;
-                        }
-                }
-        </script>
-            
-
+        <script src="js/register.js"></script>
     </head>
 
     <body>
         <div class="container p-5 m-5 mx-auto border bg-light text-dark needs-validation">
-            <h2>Register Student</h2> 
+            <h2>Register</h2> 
             <form name="register" method="post" onsubmit="return testEmail()">
 
                 <div class="mt-3">
@@ -165,33 +153,34 @@ if tutor/admin add "false" to field "approved" -->
 
                 <div class="mt-3">
                     <label for="userType">Registering as...</label>
-                    <select class="mb-3 dropdown form-control" id="userType">
+                    <select class="mb-3 dropdown form-control" id="userType" name="userType">
                         <option value="0" selected>Student</option>
                         <option value="1">Tutor</option>
                         <option value="2">Admin</option>
                     </select>
                 </div>
 
-                <button type="submit" id="submit" name="submit" class="btn btn-primary">Submit</button>
-            </form>
+                <button type="submit" id="submit" name="submit" class="btn btn-primary" onclick="submitButton()">Submit</button>
 
-            <!-- tutor approval time popup -->
-            <div class="modal fade" id="tutorModal" tabindex="-1" role="dialog" aria-labelledby="tutorModalLabel" aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="tutorModalLabel">Tutor/Admin Approval</h5>
-                        </div>
-                        <div class="modal-body">
-                            <p>New tutor and admin accounts require approval from an administrator before accessing the site.</p>
-                            <p>If you are not able to access the site within 72 hours, please contact your system administrator.</p>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <!-- tutor approval time popup -->
+                <div class="modal fade" id="tutorModal" tabindex="-1" role="dialog" aria-labelledby="tutorModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="tutorModalLabel">Tutor/Admin Approval</h5>
+                            </div>
+                            <div class="modal-body">
+                                <p>New tutor and admin accounts require approval from an administrator before accessing the site.</p>
+                                <p>If you are not able to access the site within 72 hours, please contact your system administrator.</p>
+                            </div>
+                            <div class="modal-footer">
+                                <!-- needs fixing!! currently just closes the modal -->
+                                <button type="submit" id="submit" name="submit" class="btn btn-primary" onclick="submitModal()">Okay</button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </form>
         </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     </body>
