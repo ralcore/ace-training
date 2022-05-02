@@ -73,12 +73,19 @@ if tutor/admin add "false" to field "approved" -->
             case 0:
                 $usertype = "Student";
                 $approved = 1;
+                break;
             case 1:
                 $usertype = "Tutor";
                 $approved = 0;
+                break;
             case 2:
                 $usertype = "Admin";
                 $approved = 0;
+                break;
+            default:
+                $usertype = "Student";
+                $approved = 1;
+                break;
         }
 
         //assuming all above are cleared...
