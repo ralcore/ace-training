@@ -20,16 +20,15 @@
             </div>
             <form action="quizview-student-marker.php" method="post">
                 <?php
-                    // error reporting
-                    ini_set('display_errors', 1);
-                    ini_set('display_startup_errors', 1);
-                    error_reporting(E_ALL);
+                    require_once __DIR__ . '/vendor/autoload.php';
+                    require_once "includes/init.php";
+                    // connect to mongodb
+                    $m = new MongoDB\Client("mongodb://localhost:27017");
+                    $collection = $m->acetraining->quiz;
 
                     // takes json input (see examplequiz.json for example)
                     // renders to quiz layout
-
-                    $examplejson_contents = file_get_contents("js//examplejson/examplejson.json") or die();
-                    $json = json_decode($examplejson_contents);
+                    $json = $collection->find(["_id" => new MongoDB\BSON\ObjectID("62705c3f3c011e3630c07dd3")])->toArray()[0];
                     for ($i = 0; $i < Count($json->questions); $i++) {
                         // echo start of question body
                         echo "<div class=\"row rounded\" style=\"margin-top:8px\">

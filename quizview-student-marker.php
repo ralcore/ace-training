@@ -1,14 +1,14 @@
 <?php
-    // error reporting
-    ini_set('display_errors', 1);
-    ini_set('display_startup_errors', 1);
-    error_reporting(E_ALL);
+    require_once __DIR__ . '/vendor/autoload.php';
+    require_once "includes/init.php";
+    // connect to mongodb
+    $m = new MongoDB\Client("mongodb://localhost:27017");
+    $collection = $m->acetraining->quiz;
 
     // ASSUMING CHECKBOXES ALWAYS HAVE A CORRECT ANSWER (TODO)
     // php script that marks submitted quizzes and feeds results to database
     // getting json for answers
-    $examplejson_contents = file_get_contents("js//examplejson/examplejson.json") or die();
-    $json = json_decode($examplejson_contents);
+    $json = $collection->find(["_id" => new MongoDB\BSON\ObjectID("62705c3f3c011e3630c07dd3")])->toArray();
     
     // getting key names
     $keynames = array_keys($_POST);

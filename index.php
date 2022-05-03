@@ -26,10 +26,10 @@
                         //check password
                         $stmt->bind_result($db_id, $db_username, $db_email, $db_password, $db_usertype);
                         if ($stmt->fetch()) {
-                            print_r($db_password);
                             if (password_verify($password, $db_password)) {
                                 //right password, save to session variables
                                 $_SESSION['loggedin'] = true;
+                                $_SESSION['id'] = $db_id;
                                 $_SESSION['username'] = $db_username;
                                 $_SESSION['email'] = $db_email;
                                 $_SESSION['usertype'] = $db_usertype;
