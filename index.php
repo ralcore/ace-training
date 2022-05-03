@@ -23,7 +23,7 @@
                 if ($stmt->execute()) {
                     $stmt->store_result();
                     if ($stmt->num_rows() == 1) {
-                        //check password
+                        //check password .S
                         $stmt->bind_result($db_id, $db_username, $db_email, $db_password, $db_usertype);
                         if ($stmt->fetch()) {
                             print_r($db_password);
@@ -100,13 +100,13 @@
                         }
                 }
         </script>
-            
+
 
     </head>
 
     <body>
         <div class="container p-5 m-5 mx-auto border bg-light text-dark needs-validation">
-            <h2>Login</h2> 
+            <h2>Login</h2>
             <form name="login" method="post" onsubmit="return testEmail()">
                 <div class="mt-3">
                     <label for="email">Email: </label>
@@ -130,7 +130,7 @@
                         <input type="checkbox" id="remember" name="remember" class="form-check-input"> Remember me
                     </label>
                 </div>
-                
+
                 <button type="submit" id="submit" name="submit" class="btn btn-primary">Submit</button>
             </form>
         </div>
