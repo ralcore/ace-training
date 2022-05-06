@@ -8,6 +8,7 @@
 	$conn = mysqli_connect("localhost", "root", "root");
 	$sql = "CREATE DATABASE aceTraining";
 	mysqli_query ($conn,$sql);
+	# create users table
 	$conn = mysqli_connect("localhost", "root", "root", "aceTraining");
 	$sql = "CREATE TABLE IF NOT EXISTS users (
 		id INT NOT NULL AUTO_INCREMENT,
@@ -19,6 +20,22 @@
 		PRIMARY KEY (id)
 		)";
 	mysqli_query ($conn,$sql) or die(mysqli_error($conn));
+	# create courses table
+	$sql = "CREATE TABLE IF NOT EXISTS courses (
+		id INT NOT NULL AUTO_INCREMENT,
+		coursename VARCHAR(100) NOT NULL,
+		coursedesc VARCHAR(255),
+		PRIMARY KEY (id)
+		)";
+	mysqli_query ($conn,$sql) or die(mysqli_error($conn));
+	# create coursesUsers table
+	$sql = "CREATE TABLE IF NOT EXISTS coursesUsers (
+		userid INT NOT NULL,
+		courseid INT NOT NULL,
+		PRIMARY KEY (userid, courseid)
+		)";
+	mysqli_query ($conn,$sql) or die(mysqli_error($conn));
+
 	
 	# mongoDB setup
 	phpinfo();
