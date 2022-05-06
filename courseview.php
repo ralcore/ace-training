@@ -2,17 +2,17 @@
 
 require_once __DIR__ . '/vendor/autoload.php';
 require_once "includes/init.php";
+session_start();
 
+// if nobody logged in or no course is specified, redirect to login
 if (!isset($_POST['courseid']) || !isset($_SESSION['loggedin'])) {
     header("Location: index.php"); exit;
 }
 
-// $_POST['courseid'] = 123
 // query database - if student is not on course, redirect to login
-
-$sql = 'SELECT userid, courseid, FROM coursesUsers WHERE userid = ? AND courseid = ?';
+$sql = 'SELECT userid, courseid FROM coursesUsers WHERE userid = ? AND courseid = ?';
 if ($stmt = mysqli_prepare($db, $sql)) {
-    $stmt->bind_param('ss', $_SESSION['id'], $_POST['courseid']);
+    $stmt->bind_param('ii', $_SESSION['id'], $_POST['courseid']);
     if ($stmt->execute()) {
         $stmt->store_result();
         if ($stmt->num_rows() == 0) {
@@ -24,6 +24,34 @@ if ($stmt = mysqli_prepare($db, $sql)) {
 } else {
     $database_error = "unknown database error occurred (1)";
 }
+
+if (isset($database_error)) { echo($database_error); exit; }
+
+// we already know user info ($_SESSION), so we get the course info
+$sql = 'SELECT coursename, coursedesc FROM courses WHERE id = ?';
+if ($stmt = mysqli_prepare($db, $sql)) {
+    $stmt->bind_param('i', $_POST['courseid']);
+    if ($stmt->execute()) {
+        $stmt->store_result();
+        if ($stmt->num_rows() >= 1) {
+            $stmt->bind_result($db_coursename, $db_coursedesc);
+            if (!$stmt->fetch()) {
+                $database_error = "unknown database error occurred (6)";
+            }
+        } else {
+            $database_error = "unknown database error occurred (5). there may be more than one course with the specified id.";
+        }
+    } else {
+        $database_error = "unknown database error occurred (4)";
+    }
+} else {
+    $database_error = "unknown database error occurred (3)";
+}
+
+if (isset($database_error)) { echo($database_error); exit; }
+
+echo($db_coursename);
+echo($db_coursedesc);
 
 ?>
 
@@ -45,7 +73,7 @@ if ($stmt = mysqli_prepare($db, $sql)) {
             <div class="row rounded" style="margin-top:8px">
                 <div class="col-sm-12">
                     <div class="card card-body">
-                        <h5 class="card-title">CSCCORE001 - Core Computing</h5>
+                        <h5 class="card-title"><?php echo($db_coursename); ?></h5>
                         <a href="#" class="card-link">Back</a>
                     </div>
                 </div>
@@ -57,12 +85,31 @@ if ($stmt = mysqli_prepare($db, $sql)) {
                             <li class="list-group-item">
                                 <h5 class="card-title">Lecturers:</h5>
                                 <ul>
-                                    <li>robot 1</li>
-                                    <li>robot 2</li>
-                                    <li>the robot from wall-e</li>
+                                <?php 
+                                // getting list of lecturers assigned to course
+                                $sql = 'SELECT u.username FROM coursesUsers c LEFT JOIN users u ON c.userid = u.id AND u.usertype = "Tutor" WHERE u.username IS NOT NULL';
+                                if ($stmt = mysqli_prepare($db, $sql)) {
+                                    if ($stmt->execute()) {
+                                        $stmt->store_result();
+                                        if ($stmt->num_rows() > 0) {
+                                            $stmt->bind_result($db_tutorname);
+                                            while ($stmt->fetch()) {
+                                                echo("<li>" . $db_tutorname . "</li>\n");
+                                            }
+                                        } else {
+                                            $database_error = "no tutors are assigned to this course. please contact your tutor for more information.";
+                                        }
+                                    } else {
+                                        $database_error = "unknown database error occurred (8)";
+                                    }
+                                } else {
+                                    $database_error = "unknown database error occurred (7)";
+                                }
+                                if (isset($database_error)) { echo($database_error); exit; }
+                                ?>
                                 </ul>
                             </li>
-                            <li class="list-group-item"><p class="card-text">introducing the fundamentals of computer science. socks not included</p></li>
+                            <li class="list-group-item"><p class="card-text"><?php echo($db_coursedesc) ?></p></li>
                         </ul>
                     </div>
                 </div>

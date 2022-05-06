@@ -25,10 +25,11 @@
                     // connect to mongodb
                     $m = new MongoDB\Client("mongodb://localhost:27017");
                     $collection = $m->acetraining->quiz;
+                    $quizid = "627559175b7099d5cd7621dd";
 
                     // takes json input (see examplequiz.json for example)
                     // renders to quiz layout
-                    $json = $collection->find(["_id" => new MongoDB\BSON\ObjectID("62705c3f3c011e3630c07dd3")])->toArray()[0];
+                    $json = $collection->find(["_id" => new MongoDB\BSON\ObjectID($quizid)])->toArray()[0];
                     for ($i = 0; $i < Count($json->questions); $i++) {
                         // echo start of question body
                         echo "<div class=\"row rounded\" style=\"margin-top:8px\">
@@ -59,14 +60,9 @@
                     </div>";
                     }
                 ?>
-                <div class="row rounded" style="margin-top:8px">
-                    <div class="alert alert-danger" role="alert" style="margin:0px;">
-                        <b>You have incomplete questions!</b> Press "Submit" to submit anyway.
-                    </div>
-                </div>
                 <div class="row rounded" style="margin-top:8px;margin-bottom:8px;">
                     <div class="col-sm-6">
-                        <button type="submit" class="btn btn-success">Submit</button>
+                        <button name="quizid" type="submit" value="<?php echo($quizid); ?>" class="btn btn-success">Submit</button>
                         <button type="button" class="btn btn-secondary">Close</button>
                     </div>
                 </div>
