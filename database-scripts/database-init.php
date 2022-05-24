@@ -35,7 +35,6 @@
 		PRIMARY KEY (userid, courseid)
 		)";
 	mysqli_query ($conn,$sql) or die(mysqli_error($conn));
-
 	
 	# mongoDB setup
 	phpinfo();

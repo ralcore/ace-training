@@ -25,6 +25,15 @@
         $_SESSION['quizeditor']['questions'] = array();
     }
 
+    //handling posts from courseview.php
+    if (isset($_POST['courseid'])) {
+        $_SESSION['quizeditor']['courseid'] = $_POST['courseid'];
+    }
+
+    if (isset($_POST['week'])) {
+        $_SESSION['quizeditor']['week'] = $_POST['week'];
+    }
+
     array_push($_SESSION['quizeditor']['questions'], $array);
     //print_r(json_encode($_SESSION['quizeditor']));
 ?>
