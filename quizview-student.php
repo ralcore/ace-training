@@ -25,7 +25,7 @@
                     // connect to mongodb
                     $m = new MongoDB\Client("mongodb://localhost:27017");
                     $collection = $m->acetraining->quiz;
-                    $quizid = "627559175b7099d5cd7621dd";
+                    $quizid = $_POST["quizid"];
 
                     // takes json input (see examplequiz.json for example)
                     // renders to quiz layout

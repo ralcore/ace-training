@@ -6,7 +6,7 @@
     // getting quiz info from post
     $m = new MongoDB\Client("mongodb://localhost:27017");
     $collection = $m->acetraining->quiz;
-    $quizid = "627559175b7099d5cd7621dd";
+    $quizid = $_POST["quizid"];
 
     $json = $collection->find(["_id" => new MongoDB\BSON\ObjectID($quizid)])->toArray()[0];
     $quiz_totalquestions = Count($json->questions);
@@ -29,8 +29,7 @@
         <div class="row rounded" style="margin-top:8px">
                 <div class="col-sm-12">
                     <div class="card card-body">
-                        <h5 class="card-title">Assessment Results: CS QUIZ 1</h5>
-                        <p class="card-text">Quiz for CSC0001 - Due 2022-02-23 18:00</p>
+                        <h5 class="card-title">Assessment Results</h5>
                     </div>
                 </div>
             </div>
@@ -114,7 +113,7 @@
                     <div class="card">
                         <div class="card-body">
                             <!-- average dial -->
-                            <div class="progress mx-auto" data-value='<?php echo(round($quiz_totalquestions/$quiz_combinedscore*100, 2)) ?>'>
+                            <div class="progress mx-auto" data-value='<?php echo(round($quiz_combinedscore/$quiz_submissions/$quiz_totalquestions*100, 2)) ?>'>
                                 <span class="progress-left">
                                     <span class="progress-bar border-danger"></span>
                                 </span>
@@ -122,7 +121,7 @@
                                     <span class="progress-bar border-danger"></span>
                                 </span>
                                 <div class="progress-value w-100 h-100 rounded-circle d-flex align-items-center justify-content-center">
-                                    <div class="h2 font-weight-bold"><?php echo(round($quiz_totalquestions/$quiz_combinedscore*100, 2)) ?>%</div>
+                                    <div class="h2 font-weight-bold"><?php echo(round($quiz_combinedscore/$quiz_submissions/$quiz_totalquestions*100, 2)) ?>%</div>
                                 </div>
                             </div>
                             <h5 class="card-title">Average Score</h5>

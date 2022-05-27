@@ -1,21 +1,31 @@
 <?php
     require_once "includes/init.php";
     session_start();
-// assignment creator
-// -posted a course/week
-// -invis to repost course/week on fail
-// -name entry
-// -description
-// -due date
-// -submit
-
-print_r($_POST);
 
 # getting posted course/week
 $courseid = $_POST['courseid'];
 $week = $_POST['week'];
 
-# this is where we should sql query to create the assignment. but not yet
+# correctly format date
+$date = str_replace('T', ' ', $_POST['due']);
+
+# run sql query to insert into db
+if (isset($_POST['name'])) {
+    $sql = 'INSERT INTO assignments (courseid, week, assignmentname, assignmentdesc, duedate) VALUES (?, ?, ?, ?, ?)';
+    if ($stmt = mysqli_prepare($db, $sql)) {
+        $stmt->bind_param('iisss', $courseid, $week, $assignmentname, $assignmentdesc, $date);
+        $assignmentname = $_POST['name'];
+        $assignmentdesc = $_POST['desc'];
+        if ($stmt->execute()) {
+            header("location: index.php");
+        } else {
+            $query_error = "unknown database error occurred 2";
+        }
+    } else {
+        $query_error = "unknown database error occurred 1";
+    } 
+    if (isset($query_error)) { echo $query_error; };
+}
 ?>
 
 <!DOCTYPE html>
@@ -36,7 +46,7 @@ $week = $_POST['week'];
                 <div class="col-sm-12">
                     <div class="card card-body">
                         <h5 class="card-title">Create Assignment</h5>
-                        <form>
+                        <form method="POST">
                             <input type="text" class="form-control" name="week" id="week" value="<?php echo($week); ?>" style="display:none;">
                             <label for="name">Name:</label>
                             <input type="text" class="form-control" name="name" id="name">

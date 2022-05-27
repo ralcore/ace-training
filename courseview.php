@@ -9,6 +9,37 @@ if (!isset($_POST['courseid']) || !isset($_SESSION['loggedin'])) {
     header("Location: index.php"); exit;
 }
 
+# has the user POSTed a file? if so, save it to their submission
+if (isset($_FILES["file"]["tmp_name"])) {
+    # save file
+    if ($_FILES["file"]["error"] > 0) {
+        echo "there was an error with your file (4). please try again.";
+    } else {
+        $rel_location = "uploads/" . basename($_FILES["file"]["name"]);
+        $location = realpath(getcwd()) . "/" . $rel_location;
+        move_uploaded_file($_FILES["file"]["tmp_name"], $location);
+    }
+    # add file to database
+    $sql = 'INSERT INTO files (location, courseid, week, submitterid) VALUES (?, ?, ?, ?)';
+    if ($stmt = mysqli_prepare($db, $sql)) {
+        $stmt->bind_param('siii', $rel_location, $courseid, $week, $submitterid);
+        $courseid = intval($_POST['courseid']);
+        $week = intval($_POST['week']);
+        $submitterid = intval($_SESSION["id"]);
+        if (!$stmt->execute()) {
+            $submission_error = "unknown database error occurred (5)";
+        }
+    } else {
+        $submission_error = "unknown database error occurred (6)";
+    } 
+    if (isset($submission_error)) { 
+        # revert + delete the file we saved
+        unlink($location);
+        echo($submission_error); 
+    };
+
+}
+
 // query database - if student is not on course, redirect to login
 $sql = 'SELECT userid, courseid FROM coursesUsers WHERE userid = ? AND courseid = ?';
 if ($stmt = mysqli_prepare($db, $sql)) {
@@ -49,9 +80,6 @@ if ($stmt = mysqli_prepare($db, $sql)) {
 }
 
 if (isset($database_error)) { echo($database_error); exit; }
-
-echo($db_coursename);
-echo($db_coursedesc);
 
 ?>
 
@@ -134,15 +162,20 @@ echo($db_coursedesc);
                     </div>
                 </div>
             </div>
-        <div class="accordion" id="accordionExample" style="margin-top:8px;">
             <!-- yonk https://getbootstrap.com/docs/5.0/components/accordion/ -->
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="headingOne">
-                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                    Week 3 [databases]
+            <?php
+            # this is probably the most complex page in the project. if ur not sure where to start, pls ask!
+            # iterate week-by-week (up to 36 weeks)
+            for ($i = 1; $i < 37; $i++) {
+
+                # echo start of accordion
+                echo('<div class="accordion-item">
+                <h2 class="accordion-header" id="week' . $i . '">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse' . $i . '" aria-expanded="true" aria-controls="collapseOne">
+                    Week ' . $i . '
                 </button>
                 </h2>
-                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                <div id="collapse' . $i . '" class="accordion-collapse collapse show" aria-labelledby="week' . $i . '" data-bs-parent="#accordionExample">
                 <div class="accordion-body week-accordion">
                     <table class="table">
                         <thead>
@@ -153,54 +186,108 @@ echo($db_coursedesc);
                             <th scope="col"></th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <th scope="row">Document</th>
-                                <td>database_spec.odf</td>
-                                <td></td>
-                                <td><button type="button" class="btn btn-primary">Download</button></td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Quiz</th>
-                                <td>Database Week 3 Quiz</td>
-                                <td>2021-04-21 18:00</td>
-                                <td><button type="button" class="btn btn-primary">Attempt</button></td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Assignment</th>
-                                <td>Database End-of-Year Assignment</td>
-                                <td>2021-06-20 11:59</td>
-                                <td><button type="button" class="btn btn-primary">Submit</button></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                </div>
-            </div>
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="headingTwo">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                    Week 2 [advanced skuncc theory]
-                </button>
-                </h2>
-                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
-                <div class="accordion-body">
-                    <strong>This is the second item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
-                </div>
-                </div>
-            </div>
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="headingThree">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                    Week 1 [skuncc theory]
-                </button>
-                </h2>
-                <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
-                <div class="accordion-body">
-                    <strong>This is the third item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
-                </div>
-                </div>
-            </div>
+                        <tbody>');
+
+                # grabbing and displaying documents
+                $sql = 'SELECT id, location, week, courseid FROM files WHERE courseid = ? AND week = ?';
+                if ($stmt = mysqli_prepare($db, $sql)) {
+                    $stmt->bind_param('ii', $_POST['courseid'], $i);
+                    if ($stmt->execute()) {
+                        $stmt->store_result();
+                        $stmt->bind_result($file_id, $file_loc, $file_week, $file_course);
+                        while ($stmt->fetch()) {
+                            echo('<tr>');
+                            echo('<th scope="row">File</th>');
+                            echo('<td>' . basename($file_loc) . '</td>');
+                            echo('<td></td>');
+                            echo('<td>'); 
+                            echo('<a href="' . $file_loc . '" class="btn btn-primary" download>Download</a></td>');
+                            echo('</tr>');
+                        }
+                    } else {
+                        $aq_error = "unknown database error occurred (8)";
+                    }
+                    $aq_error = "unknown database error occurred (9)";
+                }
+
+                # grabbing and displaying quizzes
+                # connect mongo
+                $m = new MongoDB\Client("mongodb://localhost:27017");
+                $collection = $m->acetraining->quiz;
+                $cursor = $collection->find(["week" => (string) $i, "courseid" => (string) $_POST["courseid"]]);
+                $cursor->setTypeMap(['root' => 'array', 'document' => 'array', 'array' => 'array']);
+                foreach ($cursor as $quiz) {
+                    echo('<tr>');
+                    echo('<th scope="row">Quiz</th>');
+                    echo('<td></td>');
+                    echo('<td></td>');
+                    echo('<td>'); 
+                    $destination = ($_SESSION['usertype'] == "Student") ? "quizview-student.php" : "quizview-tutor.php";
+                    echo('<form action="' . $destination . '" method="POST">');
+                    echo('<button type="submit" name="quizid" value="' . $quiz["_id"] . '" class="btn btn-primary">Attempt</button></form></td>');
+                    echo('</tr>');
+                }
+
+                # grabbing and displaying assignments
+                $sql = 'SELECT id, courseid, week, assignmentname, duedate FROM assignments WHERE courseid = ? AND week = ?';
+                if ($stmt = mysqli_prepare($db, $sql)) {
+                    $stmt->bind_param('ii', $_POST['courseid'], $i);
+                    if ($stmt->execute()) {
+                        $stmt->store_result();
+                        $stmt->bind_result($assignment_id, $assignment_course, $assignment_week, $assignment_name, $assignment_duedate);
+                        while ($stmt->fetch()) {
+                            echo('<tr>');
+                            echo('<th scope="row">Assignment</th>');
+                            echo('<td>' . $assignment_name . '</td>');
+                            echo('<td>' . $assignment_duedate . '</td>');
+                            echo('<td>'); 
+                            $destination = ($_SESSION['usertype'] == "Student") ? "assignmentview-student.php" : "assignmentview-tutor.php";
+                            echo('<form action="' . $destination . '" method="POST">');
+                            echo('<button type="submit" name="assignmentid" value="' . $assignment_id . '" class="btn btn-primary">Submit</button></form></td>');
+                            echo('</tr>');
+                        }
+                    } else {
+                        $aq_error = "unknown database error occurred (10)";
+                    }
+                    $aq_error = "unknown database error occurred (11)";
+                }
+
+                # echo admin options for adding new items
+                if ($_SESSION['usertype'] == "Tutor" || $_SESSION['usertype'] == "Admin") {
+                    # add file to assignment
+                    echo('<tr>');
+                    echo('<td>');
+                    echo('<form method="POST" name="' . $i . '_tutornewfile' . '" enctype="multipart/form-data" style="max-width:100%;">');
+                    echo('<label for="file">Add file:</label>');
+                    echo('<input type="file" id="file" name="file" style="font-size:12px;">');
+                    echo('<input type="text" class="form-control" name="week" id="week" value="' . $i . '" style="display:none">');
+                    echo('<button type="submit" id="courseid" name="courseid" value="' . $_POST["courseid"] . '" class="btn btn-success">Upload</button>');
+                    echo('</form>');
+                    echo('</td>');
+                    echo('<td>');
+                    echo('<form method="POST" name="' . $i . '_tutornewquiz' . '" action="quizcreator.php">');
+                    echo('<input type="text" class="form-control" name="week" id="week" value="' . $i . '" style="display:none">');
+                    echo('<button type="submit" id="courseid" name="courseid" value="' . $_POST["courseid"] . '" class="btn btn-success">Add Quiz</button>');
+                    echo('</form>');
+                    echo('</td>');
+                    echo('<td>');
+                    echo('<form method="POST" name="' . $i . '_tutornewassignment' . '" action="assignmentcreator.php">');
+                    echo('<input type="text" class="form-control" name="week" id="week" value="' . $i . '" style="display:none">');
+                    echo('<button type="submit" id="courseid" name="courseid" value="' . $_POST["courseid"] . '" class="btn btn-success">Add Assignment</button>');
+                    echo('</form>');
+                    echo('</td>');
+                    echo('</tr>');
+                }
+
+                # echo end of accordion
+                echo('</tbody>
+                        </table>
+                    </div>
+                    </div>
+                </div>');
+            }
+
+            ?>
             </div>
         </div>
     </body>

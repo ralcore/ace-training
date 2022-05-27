@@ -55,7 +55,7 @@
 
     //after successful login, or if already logged in, redirect to coursesview
     if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
-        if($_SESSION["usertype"] = "student") {
+        if($_SESSION["usertype"] == "Student") {
             header("location: coursesview-student.php");
             exit;
         } else {

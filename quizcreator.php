@@ -7,19 +7,20 @@
     if (isset($_POST['submit'])) {
         $m = new MongoDB\Client("mongodb://localhost:27017");
         $collection = $m->acetraining->quiz;
-
-        //TODO: CREATE ASSOCIATIVE DATABASE ENTRY
         $result = $collection->insertOne($_SESSION['quizeditor']);
         $json = $collection->find(["_id" => $result])->toArray();
+        header("location: index.php");
     }
 
     //take new posted question and arrange to add it to session variable array
-    $array = array("question" => $_POST['addquestion_question'], 
-                "answers" => [["text" => $_POST['addquestion_answer0'], "correct" => isset($_POST['addquestion_correct0']) ? 1 : 0],
-                            ["text" => $_POST['addquestion_answer1'], "correct" => isset($_POST['addquestion_correct1']) ? 1 : 0],
-                            ["text" => $_POST['addquestion_answer2'], "correct" => isset($_POST['addquestion_correct2']) ? 1 : 0],
-                            ["text" => $_POST['addquestion_answer3'], "correct" => isset($_POST['addquestion_correct3']) ? 1 : 0]], 
-                "check" => isset($_POST['addquestion_multiplechoice']) ? 1 : 0);
+    if (isset($_POST['addquestion_question'])) {
+        $array = array("question" => $_POST['addquestion_question'], 
+                    "answers" => [["text" => $_POST['addquestion_answer0'], "correct" => isset($_POST['addquestion_correct0']) ? 1 : 0],
+                                ["text" => $_POST['addquestion_answer1'], "correct" => isset($_POST['addquestion_correct1']) ? 1 : 0],
+                                ["text" => $_POST['addquestion_answer2'], "correct" => isset($_POST['addquestion_correct2']) ? 1 : 0],
+                                ["text" => $_POST['addquestion_answer3'], "correct" => isset($_POST['addquestion_correct3']) ? 1 : 0]], 
+                    "check" => isset($_POST['addquestion_multiplechoice']) ? 1 : 0);
+    }
     
     if (!isset($_SESSION['quizeditor']['questions'])) {
         $_SESSION['quizeditor']['questions'] = array();
@@ -34,8 +35,10 @@
         $_SESSION['quizeditor']['week'] = $_POST['week'];
     }
 
-    array_push($_SESSION['quizeditor']['questions'], $array);
-    //print_r(json_encode($_SESSION['quizeditor']));
+    if (isset($array)) {
+        array_push($_SESSION['quizeditor']['questions'], $array);
+    }
+
 ?>
 
 <!DOCTYPE html>
@@ -61,7 +64,7 @@
             <?php
                 // takes json input (see examplequiz.json for example)
                 // renders to quiz layout
-                $json = isset($_SESSION['quizeditor']) ? $_SESSION['quizeditor'] : array(['questions' => array()]);
+                $json = isset($_SESSION['quizeditor']) ? $_SESSION['quizeditor'] : array([]);
                 for ($i = 0; $i < Count($json['questions']); $i++) {
                     // echo start of question body
                     echo "<div class=\"row rounded\" style=\"margin-top:8px\">
