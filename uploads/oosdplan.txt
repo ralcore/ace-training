@@ -1,0 +1,102 @@
+level class
+| player
+| enemy
+| projectile
+| tilemap
+| gui
+| window
+
+should include some form of csv for level loading
+(object type),(constructor arguments)
+
+class Level {
+	vars:
+	Player player;
+	vector<Enemy> enemies;
+	vector<Projectile> projectiles;
+	Window window;
+	Gui gui;
+	Tilemap tilemap;
+
+	Level(Window &window) : player(Player()), window(&window), gui(Gui()), tilemap(Tilemap()){
+		// construct new level on game start
+		// calls initLevel()
+	}
+	
+	Level(&Player, &Window, &Gui) : tilemap(Tilemap()){
+		// construct new level when level cleared - what needs transferring?
+		// calls initLevel()
+	}
+
+	initLevel() {
+		// decodes level .csv file
+		// csv is of form (object type),(constructor arguments)
+		
+		// iterates through csv line-by-line
+		// case statement for object type
+		// players: sets correct properties (player is always already created)
+		// enemies: creates, appends to vector
+		// tilemaps: recreates with correct properties
+		// closes file
+	}
+
+	gameLoop() {
+		// game logic
+		// player input handling + movement
+		// projectile input handling
+		// enemy handling
+		
+		// draw everything
+	}
+	
+	nextLevel(int levelNumber) {
+		// constructs new Level, passing it transferred elements (see Level() constructors)
+		// destroys self - is this done in constructor?
+	}
+}
+
+class Player : public Entity {
+	Player() {
+		// default constructor, used in Level default constructor but immediately replaced
+	}
+	
+}
+
+class Enemy : public Entity {
+	Enemy() {
+		// default constructor, should never be used
+	}
+
+}
+
+class Projectile : public Entity {
+	Projectile() {
+		// default constructor, should never be used
+	}
+}
+
+class Entity : public sf::Drawable {
+	// is the abstract entity class.
+	// anything that a) moves and b) collides with Tilemap walls should extend this class.
+	// extends drawable to allow e.g. window.draw(Player) syntax.
+	// see https://www.sfml-dev.org/documentation/2.5.1/classsf_1_1Drawable.php
+}
+
+class Tilemap {
+	// see https://www.sfml-dev.org/tutorials/2.5/graphics-vertex-array.php
+	Tilemap() {
+		// default constructor, used in Level default constructor but immediately replaced
+	}
+}
+
+class Gui {
+	Gui() {
+		// default constructor, always used
+	}
+}
+
+class Window {
+	Window() {
+		// default constructor, always used
+	}
+}

@@ -1,0 +1,13 @@
+--Create Users
+CREATE USER 'Sales Assistant'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password';
+CREATE USER 'Client'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password';
+CREATE USER 'Supplier'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password';
+
+--Sales Assistant
+GRANT SELECT (`CID`, `forename`, `surname`, `addressL1`, `addressL2`, `townCity`, `postcode`, `email`, `phone`), INSERT (`CID`, `forename`, `surname`, `addressL1`, `addressL2`, `townCity`, `postcode`, `email`, `phone`), UPDATE (`forename`, `surname`, `addressL1`, `addressL2`, `townCity`, `postcode`, `email`, `phone`) ON `q3`.`client` TO 'Sales Assistant'@'localhost';
+
+GRANT SELECT (`PID`, `description`, `saleCost`, `quantityRemaining`), INSERT (`PID`, `description`, `saleCost`, `quantityRemaining`), UPDATE (`description`, `saleCost`, `quantityRemaining`) ON `q3`.`product` TO 'Sales Assistant'@'localhost';
+
+GRANT SELECT (`OID`, `CID`, `dateOrdered
+
+--out of time :(

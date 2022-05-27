@@ -20,16 +20,16 @@
             </div>
             <form action="quizview-student-marker.php" method="post">
                 <?php
-                    // error reporting
-                    ini_set('display_errors', 1);
-                    ini_set('display_startup_errors', 1);
-                    error_reporting(E_ALL);
+                    require_once __DIR__ . '/vendor/autoload.php';
+                    require_once "includes/init.php";
+                    // connect to mongodb
+                    $m = new MongoDB\Client("mongodb://localhost:27017");
+                    $collection = $m->acetraining->quiz;
+                    $quizid = $_POST["quizid"];
 
                     // takes json input (see examplequiz.json for example)
                     // renders to quiz layout
-
-                    $examplejson_contents = file_get_contents("js//examplejson/examplejson.json") or die();
-                    $json = json_decode($examplejson_contents);
+                    $json = $collection->find(["_id" => new MongoDB\BSON\ObjectID($quizid)])->toArray()[0];
                     for ($i = 0; $i < Count($json->questions); $i++) {
                         // echo start of question body
                         echo "<div class=\"row rounded\" style=\"margin-top:8px\">
@@ -60,14 +60,9 @@
                     </div>";
                     }
                 ?>
-                <div class="row rounded" style="margin-top:8px">
-                    <div class="alert alert-danger" role="alert" style="margin:0px;">
-                        <b>You have incomplete questions!</b> Press "Submit" to submit anyway.
-                    </div>
-                </div>
                 <div class="row rounded" style="margin-top:8px;margin-bottom:8px;">
                     <div class="col-sm-6">
-                        <button type="submit" class="btn btn-success">Submit</button>
+                        <button name="quizid" type="submit" value="<?php echo($quizid); ?>" class="btn btn-success">Submit</button>
                         <button type="button" class="btn btn-secondary">Close</button>
                     </div>
                 </div>

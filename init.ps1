@@ -55,6 +55,8 @@ if(!(Test-Path ($mongodbphplocation + "\php_mongodb.dll") -PathType Leaf)) {
 
 # adding extension to php test file (which uniserverz uses by default)
 # NOTE: IF UNISERVERZ EVER CHANGES INI FILE THIS WILL NEED CHANGING
+(Get-Content -path ($phplocation + "\php_production.ini") -Raw) -replace ';extension=mongodb','extension=mongodb' | Set-Content -Path ($phplocation + "\php_production.ini")
+(Get-Content -path ($phplocation + "\php_development.ini") -Raw) -replace ';extension=mongodb','extension=mongodb' | Set-Content -Path ($phplocation + "\php_development.ini")
 (Get-Content -path ($phplocation + "\php_test.ini") -Raw) -replace ';extension=mongodb','extension=mongodb' | Set-Content -Path ($phplocation + "\php_test.ini")
 
 
